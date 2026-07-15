@@ -1,0 +1,8 @@
+# Pipeline de ingesta (lo único que instala GitHub Actions)
+requests>=2.31
+
+# Análisis local (notebook)
+pandas>=2.2
+matplotlib>=3.9
+seaborn>=0.13
+jupyter>=1.0

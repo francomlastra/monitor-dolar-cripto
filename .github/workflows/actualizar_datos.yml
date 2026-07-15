@@ -1,0 +1,48 @@
+# Corre el pipeline de ingesta 3 veces por día (hora argentina, UTC-3)
+# y commitea la base actualizada al repo.
+#
+# Notas sobre el cron de GitHub Actions:
+# - Los horarios son UTC: 12/16/21 UTC = 09/13/18 en Argentina.
+# - Los cron pueden ejecutarse con algunos minutos de demora (es normal).
+# - GitHub desactiva los schedules si el repo pasa 60 días sin actividad;
+#   como este workflow commitea datos, se mantiene activo solo.
+
+name: Actualizar cotizaciones
+
+on:
+  schedule:
+    - cron: "0 12,16,21 * * *"
+  workflow_dispatch: {} # permite dispararlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write # necesario para poder pushear el commit con los datos
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar el repo
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias del pipeline
+        run: pip install requests
+
+      - name: Correr el pipeline de ingesta
+        run: python -m src.pipeline
+
+      - name: Commitear los datos actualizados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "Sin cambios para commitear"
+          else
+            git commit -m "data: actualización automática $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi

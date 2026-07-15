@@ -1,0 +1,15 @@
+# Ojo: data/ NO se ignora — la base SQLite y los CSV exportados
+# se versionan a propósito (el repo construye su propio dataset).
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sistema
+.DS_Store
+Thumbs.db
